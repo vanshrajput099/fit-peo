@@ -1,11 +1,17 @@
 import { useInView } from "react-intersection-observer";
 import designImage from "../assets/design.webp";
+import CustomCheckbox from "./CustomCheckbox";
+import { useState } from "react";
 
 const Design = () => {
     const { ref, inView } = useInView({
         threshold: 0.1,
         triggerOnce: true,
     });
+    const [checked, setChecked] = useState(false);
+    const onChangeFunction = () => {
+        setChecked(prev => !prev);
+    }
     return (
         <div className='min-h-screen bg-black relative'>
             <div ref={ref} className={`w-full p-3 flex flex-col gap-7 lg:gap-0 2xl:w-[75%] mx-auto py-5 text-white lg:flex-row justify-between xl:px-5 transition-all duration-400 transform  ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[100px]"}`}>
@@ -21,11 +27,11 @@ const Design = () => {
                         <input type="text" className="flex-1 border-none focus:border-none focus:outline-none active:border-none" />
                     </div>
                     <div className="flex items-center gap-2">
-                        <input className="h-14 w-14" type="checkbox" />
-                        <p className="text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure temporibus, iste qui vero voluptatem numquam odio assumenda tempora sint architecto!</p>
+                        <CustomCheckbox checked={checked} onChange={onChangeFunction} label={""} />
+                        <p className="text-xs">I would like to be added to the Design Declares! newsletter and recieve further updates.</p>
                     </div>
                     <div className="space-y-5 mt-5">
-                        <p className="text-xs">View our Privacy Policy</p>
+                        <p className="text-xs  cursor-pointer underline text-color hover:text-orange-500">View our Privacy Policy</p>
                         <button className="bg-gray-200 w-full lg:w-fit px-7 py-3 rounded-4xl text-black font-medium text-xl">Subscribe</button>
                     </div>
                 </div>
