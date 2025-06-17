@@ -8,14 +8,18 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
     const [show, setShow] = useState(false);
     const [changeSign, setChangeSign] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
-    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
+    const [initialDelay, setInitialDelay] = useState(true);
+
     const menuRef = useRef(null);
+    const scrollTimeout = useRef(null);
+    const resizeTimeout = useRef(null);
 
     const handleMenu = () => {
         setChangeSign(prev => !prev);
         setChangeBackground(prev => !prev);
         if (!show) {
-            setTimeout(() => setShow(true), 300);
+            setTimeout(() => setShow(true), 300); // Original delay
             setShowMenuContent(prev => !prev);
         } else {
             setShow(false);
@@ -23,51 +27,55 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
         }
     };
 
+    // Debounced Resize
     useEffect(() => {
         const handleResize = () => {
-            setIsSmallScreen(window.innerWidth < 640);
+            clearTimeout(resizeTimeout.current);
+            resizeTimeout.current = setTimeout(() => {
+                setIsSmallScreen(window.innerWidth < 640);
+            }, 100);
         };
 
-        handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Throttled Scroll
     useEffect(() => {
         const handleScroll = () => {
-            const stopPoint = document.getElementById(isSmallScreen ? 'stopPoint2' : 'stopPoint');
-            if (!stopPoint || !menuRef.current) return;
+            if (scrollTimeout.current) return;
+            scrollTimeout.current = setTimeout(() => {
+                const stopPoint = document.getElementById(isSmallScreen ? 'stopPoint2' : 'stopPoint');
+                if (!stopPoint || !menuRef.current) return;
 
-            const stopPointRect = stopPoint.getBoundingClientRect();
-            const windowBottom = window.scrollY + window.innerHeight;
-
-            if (isSmallScreen) {
-                const stopPointBottom = stopPoint.offsetTop + stopPoint.offsetHeight;
-
-                if (windowBottom >= stopPointBottom) {
-                    setIsFixed(false);
-                } else {
-                    setIsFixed(true);
-                }
-            } else {
                 const stopPointTop = stopPoint.offsetTop;
-                if (windowBottom >= stopPointTop - 20) {
-                    setIsFixed(false);
-                } else {
-                    setIsFixed(true);
-                }
-            }
+                const windowBottom = window.scrollY + window.innerHeight;
+
+                const shouldBeFixed = windowBottom < (isSmallScreen ? stopPointTop + stopPoint.offsetHeight : stopPointTop - 20);
+
+                setIsFixed(prev => {
+                    if (prev !== shouldBeFixed) return shouldBeFixed;
+                    return prev;
+                });
+
+                scrollTimeout.current = null;
+            }, 50);
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isSmallScreen]);
 
+    // Show/Hide Menu with Delay (Original)
     useEffect(() => {
         if (showMenu) {
-            setTimeout(() => setIsVisible(true), 50);
+            setTimeout(() => {
+                setIsVisible(true);
+                setTimeout(() => setInitialDelay(false), 600);
+            }, 50);
         } else {
             setIsVisible(false);
+            setInitialDelay(true);
         }
     }, [showMenu]);
 
@@ -76,29 +84,18 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
     const getDynamicStyle = () => {
         if (!isFixed && menuRef.current) {
             const stopPoint = document.getElementById(isSmallScreen ? 'stopPoint2' : 'stopPoint');
+            if (!stopPoint) return {};
 
-            if (isSmallScreen) {
-                const stopPointBottom = stopPoint.offsetTop + stopPoint.offsetHeight;
+            const stopPointOffset = stopPoint.offsetTop + (isSmallScreen ? stopPoint.offsetHeight : 0);
 
-                return {
-                    position: 'absolute',
-                    top: `${stopPointBottom - menuRef.current.offsetHeight - 10}px`,
-                    right: '20px'
-                };
-            } else {
-                const stopPointTop = stopPoint.offsetTop;
-
-                return {
-                    position: 'absolute',
-                    top: `${stopPointTop - menuRef.current.offsetHeight - 10}px`,
-                    right: '20px'
-                };
-            }
+            return {
+                position: 'absolute',
+                top: `${stopPointOffset - menuRef.current.offsetHeight - 10}px`,
+                right: '20px'
+            };
         }
         return {};
     };
-
-    const delay = isVisible ? "delay-0" : "delay-800";
 
     return (
         <div
@@ -108,7 +105,7 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
                 z-[9999] w-[90%] 
                 ${showMenuContent ? "sm:w-[420px]" : "sm:w-[210px]"} 
                 transition-all duration-600 transform 
-                ${delay}
+                ${initialDelay ? "delay-800" : "delay-0"}
                 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"} 
                 ${isFixed ? 'fixed bottom-5 right-5' : ''} 
             `}

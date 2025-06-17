@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CustomCheckbox from "./CustomCheckbox";
 import { COUNTRIES_ARR, DISCIPLINE_ARR } from "../data";
 import { ChevronRight } from 'lucide-react';
@@ -19,8 +19,6 @@ const EmergencyForm = () => {
 
     const [showDiscipline, setShowDiscipline] = useState(false);
     const [showCountries, setShowCountries] = useState(false);
-
-    // ✅ Flag to ignore next outside click
     const ignoreNextClick = useRef(false);
 
     const countriesRef = useRef(null);
@@ -39,12 +37,12 @@ const EmergencyForm = () => {
         }));
     };
 
-    const handleSelectChange = (name, value) => {
+    const handleSelectChange = useCallback((name, value) => {
         setFormData(prevData => ({
             ...prevData,
             [name]: value
         }));
-    }
+    })
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -52,13 +50,11 @@ const EmergencyForm = () => {
         console.log('Selected Type:', selected);
     };
 
-    // ✅ Updated Outside Click Handler
     useEffect(() => {
         const handleClickOutside = (event) => {
-
             if (ignoreNextClick.current) {
-                ignoreNextClick.current = false; // Reset flag
-                return; // Skip this click
+                ignoreNextClick.current = false;
+                return;
             }
 
             if (showCountries && countriesRef.current && !countriesRef.current.contains(event.target)) {
@@ -142,13 +138,13 @@ const EmergencyForm = () => {
                     />
                 </div>
 
-                {/* ✅ Country Dropdown */}
+
                 <div className="flex flex-col xl:flex-row xl:gap-2 p-4 text-lg xl:text-xl border-b-1 relative">
                     <label>Country:*</label>
                     <div
                         onClick={(e) => {
                             e.stopPropagation();
-                            ignoreNextClick.current = true; // 👈 Yeh flag set karo
+                            ignoreNextClick.current = true;
                             setShowDiscipline(false);
                             setShowCountries(prev => !prev);
                         }}
@@ -182,13 +178,13 @@ const EmergencyForm = () => {
                     )}
                 </div>
 
-                {/* ✅ Discipline Dropdown */}
+
                 <div className="flex flex-col xl:flex-row xl:gap-2 p-4 text-lg xl:text-xl border-b-1 relative">
                     <label>Discipline:*</label>
                     <div
                         onClick={(e) => {
                             e.stopPropagation();
-                            ignoreNextClick.current = true; // 👈 Yeh flag set karo
+                            ignoreNextClick.current = true;
                             setShowDiscipline(prev => !prev);
                             setShowCountries(false);
                         }}
