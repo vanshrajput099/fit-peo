@@ -13,7 +13,7 @@ const Latest = () => {
     return (
         <div className='min-h-screen bg-black relative'>
             <div className='w-full p-3 flex flex-col gap-7 lg:gap-0 2xl:w-[75%] mx-auto py-5 text-white lg:flex-row justify-between xl:px-5'>
-                <div ref={textRef} className={`sticky top-8 h-fit transition-all duration-400 transform  ${textInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[100px]"}`}>
+                <div ref={textRef} className={`lg:sticky lg:top-8 lg:h-fit transition-all duration-400 transform  ${textInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[100px]"}`}>
                     <h1 className='font-bold text-2xl'>Latest</h1>
                 </div>
                 <div className='w-full sm:w-full lg:w-[55%] xl:w-[57%] space-y-10'>

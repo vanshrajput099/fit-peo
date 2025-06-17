@@ -10,7 +10,7 @@ const Section1 = () => {
     return (
         <div className={`min-h-screen bg-black relative`}>
             <div ref={ref} className={`w-full p-3 flex flex-col gap-7 lg:gap-0 2xl:w-[75%] mx-auto py-5 text-white lg:flex-row justify-between xl:px-5 transition-all duration-400 transform  ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-50"}`}>
-                <div className="lg:w-[35%] sticky top-8 h-fit">
+                <div className="lg:w-[35%] lg:sticky lg:top-8 lg:h-fit">
                     <h1 className='font-bold text-xl lg:text-2xl'>This is Breakdown</h1>
                 </div>
 
