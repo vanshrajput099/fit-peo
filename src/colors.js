@@ -1,0 +1,1 @@
+export const ORANGE_COLOR = "#FF6340"
