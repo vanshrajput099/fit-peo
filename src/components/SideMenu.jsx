@@ -98,6 +98,8 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
         return {};
     };
 
+    const delay = isVisible ? "delay-0" : "delay-800";
+
     return (
         <div
             ref={menuRef}
@@ -105,7 +107,8 @@ const SideMenu = ({ showMenu, setChangeBackground }) => {
             className={`
                 z-[9999] w-[90%] 
                 ${showMenuContent ? "sm:w-[420px]" : "sm:w-[210px]"} 
-                transition-all duration-600 transform
+                transition-all duration-600 transform 
+                ${delay}
                 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"} 
                 ${isFixed ? 'fixed bottom-5 right-5' : ''} 
             `}
